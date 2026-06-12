@@ -1,4 +1,4 @@
-import type { Signal, FormType } from './content'
+import type { Signal, FormType, SponsorConfig } from './content'
 
 // mulberry32 seeded PRNG
 function mkRng(seed: number): () => number {
@@ -228,6 +228,26 @@ function buildHiddenLayers(seed: number): string {
   return `<div style="position:absolute;inset:0;overflow:hidden">${els.join('')}</div>`
 }
 
+// ─── SPONSOR LAYER ──────────────────────────────────────────────────────────
+
+// Sponsor content appears at the specified zoom_level.
+// font-size = 10px / zoom_level → readable when browser zoom reaches zoom_level × 100%
+function buildSponsorLayer(sponsor: SponsorConfig): string {
+  const fontSize = (10 / sponsor.zoom_level).toFixed(3)
+  const positions = [
+    { x: 50, y: 50 },
+    { x: 18, y: 22 },
+    { x: 76, y: 68 },
+    { x: 32, y: 80 },
+    { x: 82, y: 14 },
+  ]
+  const base = `font-size:${fontSize}px;color:#c0c0d8;opacity:0.55;white-space:nowrap;font-family:'Geist Mono',ui-monospace,monospace;letter-spacing:0.05em;pointer-events:none`
+  const els = positions.map(({ x, y }) =>
+    `<div style="position:absolute;left:${x}%;top:${y}%;transform:translate(-50%,-50%);${base}">${sponsor.content}</div>`
+  ).join('')
+  return `<div style="position:absolute;inset:0;overflow:hidden">${els}</div>`
+}
+
 // ─── PAGE COMPOSITOR ─────────────────────────────────────────────────────────
 
 // Type determined by seed % 3:
@@ -235,19 +255,22 @@ function buildHiddenLayers(seed: number): string {
 //   1 = Type B: zoom-reveal text only
 //   2 = Type C: SVG + hidden text hybrid
 
-export function generatePage(signal: Signal): string {
+export function generatePage(signal: Signal, sponsor?: SponsorConfig | null): string {
   const type = signal.seed % 3
   let content = ''
 
   if (type === 0 || type === 2) {
     content += buildSVG(signal)
   } else {
-    // Type B: pure dark background
     content += `<div style="position:absolute;inset:0;background:#0a0a0a"></div>`
   }
 
   if (type === 1 || type === 2) {
     content += buildHiddenLayers(signal.seed)
+  }
+
+  if (sponsor?.active && sponsor.content) {
+    content += buildSponsorLayer(sponsor)
   }
 
   return `<div style="position:absolute;inset:0">${content}</div>`

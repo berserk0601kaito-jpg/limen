@@ -3,6 +3,25 @@ import path from 'path'
 
 export type FormType = 'void' | 'fracture' | 'field' | 'threshold' | 'signal' | 'convergence' | 'erosion'
 
+export interface SponsorConfig {
+  active: boolean
+  name: string
+  zoom_level: number
+  content: string
+}
+
+const DEFAULT_SPONSOR: SponsorConfig = { active: false, name: '', zoom_level: 8, content: '' }
+
+export function getSponsorConfig(): SponsorConfig {
+  try {
+    const configPath = path.join(process.cwd(), '..', 'config', 'sponsor.json')
+    if (!fs.existsSync(configPath)) return DEFAULT_SPONSOR
+    return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+  } catch {
+    return DEFAULT_SPONSOR
+  }
+}
+
 export interface Signal {
   date: string
   seed: number

@@ -1,9 +1,10 @@
-import { getTodaySignal } from '@/lib/content'
+import { getTodaySignal, getSponsorConfig } from '@/lib/content'
 import { generatePage } from '@/lib/renderer'
 
 export default function Home() {
   const signal = getTodaySignal()
-  const html = generatePage(signal)
+  const sponsor = getSponsorConfig()
+  const html = generatePage(signal, sponsor)
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>

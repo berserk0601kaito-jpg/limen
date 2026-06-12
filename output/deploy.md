@@ -37,9 +37,11 @@ Vercelダッシュボード → Settings → Environment Variables:
 
 GitHub Secrets（Settings → Secrets → Actions）:
 
-| シークレット名 | 値 |
-|-------------|-----|
-| `ANTHROPIC_API_KEY` | `sk-ant-...` |
+| シークレット名 | 値 | 用途 |
+|-------------|-----|------|
+| `ANTHROPIC_API_KEY` | `sk-ant-...` | 将来のClaude API連携用（現在は未使用） |
+| `VERCEL_TOKEN` | Vercel → Account Settings → Tokens | アナリティクス取得 |
+| `VERCEL_PROJECT_ID` | Vercel → Project Settings → General | アナリティクス取得 |
 
 ### 4. Vercel × GitHub 連携
 
