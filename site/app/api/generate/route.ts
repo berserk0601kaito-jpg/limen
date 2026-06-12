@@ -21,7 +21,7 @@ interface Signal {
  * Calculate sequence number (days since epoch + 1, zero-padded to 4 digits)
  */
 function calculateSequence(date: Date): string {
-  const daysSinceEpoch = Math.floor((date - EPOCH_DATE) / (24 * 60 * 60 * 1000))
+  const daysSinceEpoch = Math.floor((date.getTime() - EPOCH_DATE.getTime()) / (24 * 60 * 60 * 1000))
   const seqNum = daysSinceEpoch + 1
   return String(seqNum).padStart(4, '0')
 }
