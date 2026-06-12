@@ -60,11 +60,6 @@ html {
   animation-delay: 600ms;
 }
 
-/* Fragment highlight color */
-.fragment {
-  color: #c0c0d8;
-}
-
 /* Link styling */
 a {
   text-decoration: none;

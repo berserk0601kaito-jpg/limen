@@ -1,77 +1,58 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs'
+import path from 'path'
+
+export type FormType = 'void' | 'fracture' | 'field' | 'threshold' | 'signal' | 'convergence' | 'erosion'
 
 export interface Signal {
-  date: string;
-  sequence: string;
-  number: string;
-  fragment: string;
-  color: string;
-  sponsored?: boolean;
-  sponsorUrl?: string;
+  date: string
+  seed: number
+  primary: string
+  secondary: string
+  form: FormType
+  speed: number
+  sponsored?: boolean
+  sponsorUrl?: string
 }
 
-const EMPTY_SIGNAL: Signal = {
-  date: "",
-  sequence: "",
-  number: "",
-  fragment: "",
-  color: "#0a0a0a",
-};
+const FALLBACK: Signal = {
+  date: '',
+  seed: 10002,
+  primary: '#2C1854',
+  secondary: '#202A4A',
+  form: 'void',
+  speed: 0.4,
+}
 
 export function getTodaySignal(): Signal {
   try {
-    const contentDir = path.join(process.cwd(), "..", "content");
+    const contentDir = path.join(process.cwd(), '..', 'content')
+    const today = new Date().toISOString().split('T')[0]
 
-    // Try to get today's date-specific file (YYYY-MM-DD.json)
-    const today = new Date().toISOString().split("T")[0]; // 2026-06-12
-    const dateFilePath = path.join(contentDir, `${today}.json`);
-
-    if (fs.existsSync(dateFilePath)) {
-      const fileContent = fs.readFileSync(dateFilePath, "utf-8");
-      return JSON.parse(fileContent);
+    const dateFile = path.join(contentDir, `${today}.json`)
+    if (fs.existsSync(dateFile)) {
+      return JSON.parse(fs.readFileSync(dateFile, 'utf-8'))
     }
 
-    // Fall back to seeds.json
-    const seedsPath = path.join(contentDir, "seeds.json");
-    if (fs.existsSync(seedsPath)) {
-      const seedsContent = fs.readFileSync(seedsPath, "utf-8");
-      const seeds: Signal[] = JSON.parse(seedsContent);
-
-      // Find matching date or return the last one
-      const matching = seeds.find((s) => s.date === today);
-      if (matching) {
-        return matching;
-      }
-
-      // Return last signal in seeds
-      if (seeds.length > 0) {
-        return seeds[seeds.length - 1];
-      }
+    const seedsFile = path.join(contentDir, 'seeds.json')
+    if (fs.existsSync(seedsFile)) {
+      const seeds: Signal[] = JSON.parse(fs.readFileSync(seedsFile, 'utf-8'))
+      return seeds.find(s => s.date === today) ?? seeds[seeds.length - 1] ?? FALLBACK
     }
 
-    return EMPTY_SIGNAL;
-  } catch (error) {
-    console.error("Error loading signal:", error);
-    return EMPTY_SIGNAL;
+    return FALLBACK
+  } catch {
+    return FALLBACK
   }
 }
 
 export function getAllSignals(): Signal[] {
   try {
-    const contentDir = path.join(process.cwd(), "..", "content");
-    const seedsPath = path.join(contentDir, "seeds.json");
-
-    if (fs.existsSync(seedsPath)) {
-      const seedsContent = fs.readFileSync(seedsPath, "utf-8");
-      const seeds: Signal[] = JSON.parse(seedsContent);
-      // Return in reverse order (newest first)
-      return seeds.reverse();
-    }
-
-    return [];
-  } catch (error) {
-    console.error("Error loading signals:", error);
-    return [];
+    const contentDir = path.join(process.cwd(), '..', 'content')
+    const seedsFile = path.join(contentDir, 'seeds.json')
+    if (!fs.existsSync(seedsFile)) return []
+    const seeds: Signal[] = JSON.parse(fs.readFileSync(seedsFile, 'utf-8'))
+    return [...seeds].reverse()
+  } catch {
+    return []
   }
 }
