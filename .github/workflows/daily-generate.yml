@@ -1,0 +1,39 @@
+name: Daily Signal Generation
+
+on:
+  schedule:
+    # UTC 15:00 = JST 0:00 (midnight Japan Standard Time)
+    - cron: '0 15 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Anthropic SDK
+        run: npm install @anthropic-ai/sdk
+        working-directory: scripts
+
+      - name: Generate daily signal
+        run: node generate-daily.js
+        working-directory: scripts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Commit and push new signal
+        run: |
+          git config user.email "limen@automated.signal"
+          git config user.name "LIMEN"
+          git add content/
+          # Allow the commit to fail if there are no changes (exit 0)
+          git commit -m "signal $(date -u +%Y-%m-%d)" || exit 0
+          git push
