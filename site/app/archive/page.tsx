@@ -1,5 +1,7 @@
 import { getAllSignals } from "@/lib/content";
 
+export const dynamic = 'force-dynamic'
+
 export default function Archive() {
   const signals = getAllSignals();
 

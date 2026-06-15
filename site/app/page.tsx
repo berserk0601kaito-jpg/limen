@@ -1,6 +1,8 @@
 import { getTodaySignal, getSponsorConfig } from '@/lib/content'
 import { generatePage } from '@/lib/renderer'
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const signal = getTodaySignal()
   const sponsor = getSponsorConfig()
